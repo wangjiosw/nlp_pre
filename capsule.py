@@ -57,7 +57,7 @@ class Capsule(nn.Module):
         b = torch.zeros(u_hat_vecs.size(0),self.num_capsule,1,self.in_units,device=DEVICE)
         for i in range(self.routings):
             # (batch_size,10,1,64)
-            c = F.softmax(b,1)
+            c = F.softmax(b,-1)
             # s = (batch_size,10,1,64)*(batch_size,10,64,16) = (batch_size,10,1,16)
             s = torch.matmul(c,u_hat_vecs2)
             # (batch_size,16,10)
