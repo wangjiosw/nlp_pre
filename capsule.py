@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision import datasets, transforms
+# from torchvision import datasets, transforms
 # from torch.nn.init import xavier_uniform_ as init
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 epsilon = 0.00000001
