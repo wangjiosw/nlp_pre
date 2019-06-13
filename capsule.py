@@ -23,7 +23,7 @@ def squash(x):
     # out = (batch_size,1,10)*(batch_size,16,10) = (batch_size,16,10)
     out = scale * x
     return out
-
+ 
 # A Capsule Implement with pytorch
 class Capsule(nn.Module):
     """
@@ -38,39 +38,41 @@ class Capsule(nn.Module):
         self.num_capsule = num_capsule
         self.dim_capsule = dim_capsule
         self.routings = routings
-        # (64,10,128,16)
+        # (in_units,10,128,16)
         self.W = nn.Parameter((torch.randn(self.in_units,self.num_capsule,self.in_channels, self.dim_capsule)))
 
     def forward(self, u_vecs):
-        # input u_vecs:(batch_size,channel(128),in_units(64)) 
-        # (batch_size,in_units(64),1,1,channel(128)) 
-        u_vecs = u_vecs.view(u_vecs.size(0),u_vecs.size(2),1,1,u_vecs.size(1))
+        u_vecs = u_vecs.permute(0,2,1)
+        u_vecs = u_vecs.unsqueeze(2)
+        u_vecs = u_vecs.unsqueeze(2)
+
         
-        # (batch_size,64,1,1,128)*(64,10,128,16) = (batch_size,64,10,1,16)
+        # (batch_size,in_units,1,1,in_channels)*(in_units,10,in_channels,16) = (batch_size,in_units,10,1,16)
         u_hat_vecs = torch.matmul(u_vecs,self.W)
-        # (batch_size,64,10,16)
-        u_hat_vecs = u_hat_vecs.view(u_hat_vecs.size(0),u_hat_vecs.size(1),u_hat_vecs.size(2),-1)
-        # (batch_size,10,64,16)
-        u_hat_vecs2 = u_hat_vecs.view(u_hat_vecs.size(0),u_hat_vecs.size(2),u_hat_vecs.size(1),u_hat_vecs.size(3))
+        # (batch_size,in_units,10,16)
+        u_hat_vecs = u_hat_vecs.permute(0,1,2,4,3).squeeze(4)
+        
+        # (batch_size,10,in_units,16)
+        u_hat_vecs2 = u_hat_vecs.permute(0,2,1,3)
     
-        # (batch_size,10,1,64)
+        # (batch_size,10,1,in_units)
         b = torch.zeros(u_hat_vecs.size(0),self.num_capsule,1,self.in_units,device=DEVICE)
         for i in range(self.routings):
-            # (batch_size,10,1,64)
+            # (batch_size,10,1,in_units)
             c = F.softmax(b,-1)
-            # s = (batch_size,10,1,64)*(batch_size,10,64,16) = (batch_size,10,1,16)
+            # s = (batch_size,10,1,in_units)*(batch_size,10,in_units,16) = (batch_size,10,1,16)
             s = torch.matmul(c,u_hat_vecs2)
             # (batch_size,16,10)
-            s = s.view(s.size(0),s.size(3),s.size(1))
+            s = s.permute(0,3,1,2).squeeze(3)
             # (batch_size,16,10)
             v = squash(s)
             # here
             # (batch_size,10,16,1)
-            v = v.view(v.size(0),v.size(2),v.size(1),1)
-            # (batch_size,10,64,16)*(batch_size,10,16,1) = (batch_size,10,64,1)
+            v = v.permute(0,2,1).unsqueeze(3)
+            # (batch_size,10,in_units,16)*(batch_size,10,16,1) = (batch_size,10,in_units,1)
             sim = torch.matmul(u_hat_vecs2,v)
-            # (batch_size,10,1,64)
-            sim = sim.view(sim.size(0),sim.size(1),1,sim.size(2))
+            # (batch_size,10,1,in_units)
+            sim = sim.permute(0,1,3,2)
             b = b+sim
         # (batch_size,16,10)
-        return v.view(v.size(0),v.size(2),v.size(1))
+        return v.permute(0,2,1,3).squeeze(3)
