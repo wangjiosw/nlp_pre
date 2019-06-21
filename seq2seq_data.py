@@ -46,7 +46,7 @@ class seq2seqData(object):
         and col[1] with OUTPUT_TEXT
         :return: train, val
         """
-        if not os.path.exists('data')
+        if not os.path.exists('data'):
             os.mkdir('data')
         
         data_fields = [(self.cols[0], self.INPUT_TEXT), (self.cols[1], self.OUTPUT_TEXT)]
