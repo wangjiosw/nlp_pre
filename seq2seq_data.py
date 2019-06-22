@@ -13,8 +13,8 @@ import os
 class seq2seqData(object):
     """
     :param
-        in_tokenize:    INPUT_TEXT's tokenize
-        out_tokenize:   OUT_TEXT's tokenize
+        input_field:    input text's field
+        output_field:   output text's field
         cols:           ["input_col_name","output_col_name"]
         batch_size:     iterator's batch size
         device:         iterator's device torch.device('cpu') or torch.device('cuda')
