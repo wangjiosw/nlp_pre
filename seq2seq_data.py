@@ -4,6 +4,7 @@ from torchtext import data, datasets
 from torch.nn import init
 import dill
 import os
+from nlp_pre import config
 
 # self.INPUT_TEXT = Field(batch_first=True, tokenize=in_tokenize, lower=True)
 # self.OUTPUT_TEXT = Field(batch_first=True, tokenize=out_tokenize,
@@ -40,14 +41,14 @@ class seq2seqData(object):
             glove.6B.300d
         Remaining keyword arguments: Passed to the constructor of Vectors classes.
     """
-    def __init__(self, input_field, output_field, cols, batch_size, device, data_path='.',
+    def __init__(self, input_field, output_field, batch_size=config.BATCH_SIZE, device=config.DEVICE, data_path='.',
                  in_vectors=None, out_vectors=None):
         self.DEVICE = device
         self.BATCH_SIZE = batch_size
         self.date_path = data_path
         self.in_vectors = in_vectors
         self.out_vectors = out_vectors
-        self.cols = cols
+        self.cols = ['INPUT','OUTPUT']
         # define Field
         self.INPUT_FIELD = input_field
         self.OUTPUT_FIELD = output_field
@@ -138,15 +139,15 @@ class seq2seqData(object):
         self.buildVocabulary(train, val)
 
         train_iter = data.BucketIterator(train, batch_size=self.BATCH_SIZE,
-                                         sort_key=lambda x: len(list(x.__dict__.values())[0]),
+                                         sort_key=lambda x: len(x.INPUT),
                                          shuffle=True, device=self.DEVICE)
 
         val_iter = data.BucketIterator(val, batch_size=self.BATCH_SIZE,
-                                       sort_key=lambda x: len(list(x.__dict__.values())[0]),
+                                       sort_key=lambda x: len(x.INPUT),
                                        shuffle=True, device=self.DEVICE)
 
         test_iter = data.BucketIterator(test, batch_size=self.BATCH_SIZE,
-                                        sort_key=lambda x: len(list(x.__dict__.values())[0]),
+                                        sort_key=lambda x: len(x.INPUT),
                                         shuffle=True, device=self.DEVICE)
 
         return train_iter, val_iter, test_iter

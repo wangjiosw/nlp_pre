@@ -35,10 +35,9 @@ for (data, target) in train_loader:
 **param:**
   - **input_fied:**    input text's field
   - **output_field:**   output text's field
-  - **cols:**           ["input_col_name","output_col_name"]
   - **batch_size:**     iterator's batch size
   - **device:**         iterator's device torch.device('cpu') or torch.device('cuda')
-  - **data_path:**      tran.csv, val.csv and test.csv（format:  input_text, output_text)'s dir path, default current dir
+  - **data_path:**      tran.csv, val.csv and test.csv（two col data, col's name:  INPUT, OUTPUT)'s dir path, default current dir
   - **in_vectors:**     pre-trained word embeddings
   - **out_vectors:**    pre-trained word embeddings
 
@@ -128,10 +127,9 @@ output_field = Field(batch_first=True, tokenize=out_tokenize, init_token="<sos>"
 **param:**
   - **input_fied:**    input text's field
   - **output_field:**   output text's field
-  - **cols:**           ["input_col_name","output_col_name"]
   - **batch_size:**     iterator's batch size
   - **device:**         iterator's device torch.device('cpu') or torch.device('cuda')
-  - **data_path:**      tran.csv, val.csv and test.csv（format:  input_text, output_text)'s dir path, default current dir
+  - **data_path:**      tran.csv, val.csv and test.csv（two col data, col's name:  INPUT, OUTPUT)'s dir path, default current dir
   - **vectors:**        pre-trained word embeddings
     
     available vectors input:
